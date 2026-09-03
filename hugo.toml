@@ -1,4 +1,4 @@
-baseURL = "https://blog.島呼.tw/"
+baseURL = "https://marrowtseng.github.io/blog/"
 languageCode = "zh-tw"
 title = "Dowhu's Blog"
 theme = "PaperMod"
