@@ -1,0 +1,9 @@
+baseURL = "https://blog.島呼.tw/"
+languageCode = "zh-tw"
+title = "Dowhu's Blog"
+theme = "PaperMod"
+
+[params]
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowPostNavLinks = true
