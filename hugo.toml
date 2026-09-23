@@ -7,8 +7,8 @@ paginate = 10
 
 [params]
   env = "production"
-  author = "Dowhu"
-  description = "Dowhu 的技術部落格 — 資安研究、CTF Writeup、軟體開發筆記"
+  author = "島呼"
+  description = "島呼的技術部落格 — 資安研究、CTF Writeup、軟體開發筆記"
   defaultTheme = "dark"
   disableThemeToggle = false
   ShowReadingTime = true
@@ -20,10 +20,10 @@ paginate = 10
   ShowShareButtons = false
 
   [params.homeInfoParams]
-    Title = "Dowhu"
+    Title = "島呼"
     Content = "Security Researcher / CTF Player / Developer"
-    imageUrl = "images/avatar.svg"
-    imageTitle = "Dowhu"
+    imageUrl = "images/avatar.png"
+    imageTitle = "Dune"
 
   [[params.socialIcons]]
     name = "github"
@@ -41,6 +41,11 @@ paginate = 10
 
   [params.assets]
     disableFingerprinting = false
+    favicon = "/favicon.ico"
+    favicon16x16 = "/favicon-16x16.png"
+    favicon32x32 = "/favicon-32x32.png"
+    apple_touch_icon = "/apple-touch-icon.png"
+    safari_pinned_tab = "/apple-touch-icon.png"
 
 [taxonomies]
   category = "categories"
