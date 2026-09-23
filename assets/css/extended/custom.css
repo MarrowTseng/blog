@@ -601,14 +601,17 @@ body.list {
   transform: scale(1) translateY(2px);
 }
 
-@media (max-width: 560px) {
-  .gp-dpad {
-    grid-template-columns: repeat(3, 24px);
-    grid-template-rows: repeat(3, 24px);
+/* On phones the pixel scene is just the hacker walking — no desk, no
+   robot, nothing to aim — so the controller has nothing to drive. */
+@media (max-width: 767px) {
+  #gamepad-ctrl {
+    display: none;
   }
-  .gp-btn { width: 24px; height: 24px; }
-  .gp-computer, .gp-rocket { width: 28px; height: 28px; }
-  #gamepad-panel { gap: 8px; padding: 7px 8px; }
+
+  /* the bottom strip only has to clear a smaller sprite now */
+  body {
+    padding-bottom: 80px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

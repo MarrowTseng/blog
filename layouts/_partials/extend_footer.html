@@ -191,7 +191,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var dpr = window.devicePixelRatio || 1;
     var W, H;
     var ACCENT = '#4ec9b0';
-    var S = 3;
+    // On phones the scene is cut back to just the hacker, drawn smaller.
+    var MOBILE_MAX = 767;
+    function isMobile() { return window.innerWidth <= MOBILE_MAX; }
+    var S = isMobile() ? 2 : 3;
     // The simulation runs on a fixed clock so the animation plays at the same
     // real-world speed whether the display refreshes at 60Hz, 120Hz or 144Hz.
     var SIM_HZ = 120;
@@ -204,6 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
         canvas.width = W * dpr;
         canvas.height = H * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        S = isMobile() ? 2 : 3;
     }
     resize();
     window.addEventListener('resize', resize);
@@ -484,8 +488,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Update ---
+    // his unattended pacing, used on phones and whenever nobody is driving
+    function walkOnly() {
+        hacker.frame += 0.06;
+        hacker.x += hacker.dir * 0.7;
+        if (hacker.x > W - 60) hacker.dir = -1;
+        if (hacker.x < 10) hacker.dir = 1;
+        hacker.state = 'walk';
+    }
+
     function update() {
         tick++;
+
+        if (isMobile()) {
+            // nothing to sit at or shoot on a phone; clear the scene once and
+            // then just let him pace
+            if (hacker.sitting || hacker.runningToDesk || hacker.controlled ||
+                robot || missiles.length || explosions.length || particles.length) {
+                hacker.sitting = false;
+                hacker.runningToDesk = false;
+                hacker.controlled = false;
+                hacker.crouching = false;
+                hacker.jumpY = 0;
+                hacker.vy = 0;
+                hacker.onGround = true;
+                launcherAnims = 0;
+                btnHeld = {};
+                keys = {};
+                robot = null;
+                missiles.length = 0;
+                explosions.length = 0;
+                particles.length = 0;
+            }
+            walkOnly();
+            return;
+        }
+
         updateLaunchers();
         updateRobot();
         if (fireCooldown > 0) fireCooldown--;
@@ -537,11 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 hacker.state = 'idle';
             }
         } else if (!hacker.controlled) {
-            hacker.frame += 0.06;
-            hacker.x += hacker.dir * 0.7;
-            if (hacker.x > W - 60) hacker.dir = -1;
-            if (hacker.x < 10) hacker.dir = 1;
-            hacker.state = 'walk';
+            walkOnly();
         }
 
         // jumpY is the sprite's height above the ground, integrated for a real arc
@@ -1218,10 +1252,12 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = 'rgba(78,201,176,0.12)';
         ctx.fillRect(0, GY, W, 1);
 
-        drawDesk(dx, GY);
-        drawLaunchers(dx, GY);
+        if (!isMobile()) {
+            drawDesk(dx, GY);
+            drawLaunchers(dx, GY);
+        }
         drawHacker(hacker.x, GY);
-        drawRobot(GY);
+        if (!isMobile()) drawRobot(GY);
 
         // Smoke trails (white pixel smoke)
         for (var k = 0; k < particles.length; k++) {
