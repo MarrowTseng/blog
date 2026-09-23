@@ -3,3 +3,6 @@
 public/
 resources/
 .hugo_build.lock
+
+# Personal notes, kept on this machine only — this repo is public.
+README.md
