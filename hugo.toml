@@ -30,7 +30,7 @@ paginate = 10
 
   [[params.socialIcons]]
     name = "linkedin"
-    url = "https://linkedin.com/in/PLACEHOLDER"
+    url = "https://www.linkedin.com/in/%E5%BD%A5%E8%BC%94-%E6%9B%BE-662b6226a/"
 
   [params.label]
     text = "[dowhu@blog ~]#"
