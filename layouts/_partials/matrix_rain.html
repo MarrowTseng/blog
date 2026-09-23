@@ -1,0 +1,136 @@
+<!-- Matrix digital rain background -->
+<canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+    var canvas = document.getElementById('matrix-rain');
+    if (!canvas || !canvas.getContext) return;
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var ctx = canvas.getContext('2d');
+    var chars = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789$+-*/=<>[]{}#%&@'.split('');
+    var fontSize = 15;
+    var columns = 0;
+    var drops = [];
+    var speeds = [];
+    var width = 0;
+    var height = 0;
+    var colors = {};
+    var raf = null;
+    var last = 0;
+    var frameGap = 1000 / 18;
+
+    function readColors() {
+        var css = getComputedStyle(document.documentElement);
+        var light = document.documentElement.getAttribute('data-theme') === 'light' ||
+            (!document.documentElement.getAttribute('data-theme') &&
+                window.matchMedia('(prefers-color-scheme: light)').matches);
+        var theme = css.getPropertyValue('--theme').trim() || (light ? 'rgb(248,250,252)' : 'rgb(12,16,20)');
+        var rgb = theme.match(/\d+/g) || [12, 16, 20];
+
+        colors = {
+            // translucent wash of the page background, painted each frame to fade the trail
+            fade: 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.07)',
+            trail: light ? 'rgba(20, 130, 110, 0.55)' : 'rgba(78, 201, 176, 0.75)',
+            head: light ? 'rgba(10, 90, 76, 0.9)' : 'rgba(190, 255, 240, 0.95)'
+        };
+    }
+
+    function resize() {
+        var dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.font = fontSize + 'px "JetBrains Mono", "Fira Code", monospace';
+        ctx.textBaseline = 'top';
+
+        var next = Math.ceil(width / fontSize);
+        for (var i = columns; i < next; i++) {
+            drops[i] = Math.random() * -50;
+            speeds[i] = 0.5 + Math.random() * 0.9;
+        }
+        columns = next;
+        drops.length = columns;
+        speeds.length = columns;
+
+        ctx.fillStyle = colors.fade;
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    function draw(now) {
+        raf = requestAnimationFrame(draw);
+        if (now - last < frameGap) return;
+        last = now;
+
+        ctx.fillStyle = colors.fade;
+        ctx.fillRect(0, 0, width, height);
+
+        for (var i = 0; i < columns; i++) {
+            var ch = chars[(Math.random() * chars.length) | 0];
+            var x = i * fontSize;
+            var y = drops[i] * fontSize;
+
+            if (y > 0) {
+                ctx.fillStyle = colors.trail;
+                ctx.fillText(ch, x, y);
+                // brighter leading glyph
+                ctx.fillStyle = colors.head;
+                ctx.fillText(ch, x, y);
+            }
+
+            if (y > height && Math.random() > 0.975) {
+                drops[i] = Math.random() * -20;
+                speeds[i] = 0.5 + Math.random() * 0.9;
+            }
+            drops[i] += speeds[i];
+        }
+    }
+
+    function start() {
+        if (raf || reduced.matches) return;
+        last = 0;
+        raf = requestAnimationFrame(draw);
+    }
+
+    function stop() {
+        if (raf) {
+            cancelAnimationFrame(raf);
+            raf = null;
+        }
+    }
+
+    function refresh() {
+        readColors();
+        ctx.clearRect(0, 0, width, height);
+    }
+
+    readColors();
+    resize();
+    start();
+
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resize, 150);
+    });
+
+    // pause while the tab is hidden so it costs nothing in the background
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stop(); else start();
+    });
+
+    // follow the theme toggle and the OS colour scheme
+    new MutationObserver(refresh).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+    });
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', refresh);
+    reduced.addEventListener('change', function () {
+        if (reduced.matches) stop(); else start();
+    });
+})();
+</script>

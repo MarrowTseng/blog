@@ -1,0 +1,588 @@
+/* === Layout width === */
+:root {
+  --main-width: 900px;
+  --nav-width: 1100px;
+}
+
+/* === Accent color === */
+:root {
+  --accent: #4ec9b0;
+  --accent-dim: #3a9a86;
+  --accent-bg: rgba(78, 201, 176, 0.08);
+  --accent-border: rgba(78, 201, 176, 0.25);
+}
+
+/* === Dark mode overrides === */
+:root[data-theme="dark"] {
+  --theme: rgb(12, 16, 20);
+  --entry: rgb(18, 24, 30);
+  --primary: rgb(210, 220, 225);
+  --secondary: rgb(140, 155, 165);
+  --tertiary: rgb(40, 50, 58);
+  --content: rgb(195, 205, 210);
+  --code-block-bg: rgb(18, 22, 28);
+  --code-bg: rgb(28, 35, 42);
+  --border: rgb(35, 45, 52);
+}
+
+/* dark mode when following system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --theme: rgb(12, 16, 20);
+    --entry: rgb(18, 24, 30);
+    --primary: rgb(210, 220, 225);
+    --secondary: rgb(140, 155, 165);
+    --tertiary: rgb(40, 50, 58);
+    --content: rgb(195, 205, 210);
+    --code-block-bg: rgb(18, 22, 28);
+    --code-bg: rgb(28, 35, 42);
+    --border: rgb(35, 45, 52);
+  }
+}
+
+/* === Light mode overrides === */
+:root[data-theme="light"] {
+  --theme: rgb(248, 250, 252);
+  --entry: rgb(255, 255, 255);
+  --primary: rgb(25, 30, 35);
+  --secondary: rgb(80, 95, 105);
+  --tertiary: rgb(220, 228, 232);
+  --content: rgb(30, 35, 40);
+  --code-block-bg: rgb(22, 27, 34);
+  --code-bg: rgb(235, 242, 246);
+  --border: rgb(210, 220, 228);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --theme: rgb(248, 250, 252);
+    --entry: rgb(255, 255, 255);
+    --primary: rgb(25, 30, 35);
+    --secondary: rgb(80, 95, 105);
+    --tertiary: rgb(220, 228, 232);
+    --content: rgb(30, 35, 40);
+    --code-block-bg: rgb(22, 27, 34);
+    --code-bg: rgb(235, 242, 246);
+    --border: rgb(210, 220, 228);
+  }
+}
+
+/* === Logo / terminal prompt === */
+.logo a {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  color: var(--accent);
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+
+/* === Terminal interactive === */
+.terminal-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.terminal-prompt {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  color: var(--accent);
+  font-size: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.terminal-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--primary);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 20px;
+  width: 0;
+  padding: 0;
+  margin-left: 6px;
+  transition: width 0.2s ease;
+  caret-color: var(--accent);
+}
+
+.terminal-input.active {
+  width: 160px;
+}
+
+.terminal-cursor {
+  color: var(--accent);
+  animation: terminal-blink 1s step-end infinite;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 20px;
+  margin-left: 2px;
+}
+
+.terminal-input.active + .terminal-cursor {
+  display: none;
+}
+
+.terminal-output {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 13px;
+  color: var(--secondary);
+  white-space: pre;
+  z-index: 100;
+  min-width: 240px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.terminal-output .cmd-accent {
+  color: var(--accent);
+}
+
+@keyframes terminal-blink {
+  50% { opacity: 0; }
+}
+
+/* === Post entry cards === */
+.post-entry {
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.post-entry:hover {
+  border-color: var(--accent-dim);
+  transform: translateY(-1px);
+}
+
+.post-entry .entry-cover {
+  border-radius: 10px 10px 0 0;
+}
+
+/* first entry special card */
+.first-entry {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.first-entry:hover {
+  border-color: var(--accent-dim);
+}
+
+/* === Home info (profile section) === */
+.home-info {
+  border: none;
+  background: transparent;
+}
+
+.home-info:hover {
+  border-color: transparent;
+  transform: none;
+}
+
+.home-info .entry-header h1 {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  color: var(--accent);
+}
+
+.home-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+}
+
+.home-profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--accent-border);
+  object-fit: cover;
+  transition: border-color 0.3s ease;
+}
+
+.home-profile-avatar:hover {
+  border-color: var(--accent);
+}
+
+.home-profile-name {
+  font-size: 28px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  color: var(--accent);
+  margin: 0;
+}
+
+.home-profile-subtitle {
+  font-size: 15px;
+  color: var(--secondary);
+  margin: 0;
+}
+
+/* === Tags === */
+.post-tags a,
+.terms-tags a {
+  border: 1px solid var(--accent-border);
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 13px;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.post-tags a:hover,
+.terms-tags a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* === Code blocks === */
+.post-content .highlight pre {
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+}
+
+.post-content code:not([class*="language-"]) {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* === Blockquotes === */
+.post-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 16px;
+  color: var(--secondary);
+  font-style: italic;
+}
+
+/* === ToC === */
+.toc a:hover {
+  color: var(--accent);
+}
+
+/* === Footer === */
+.footer a:hover {
+  color: var(--accent);
+}
+
+/* === Scrollbar (dark mode) === */
+:root[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--theme);
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--tertiary);
+  border-radius: 4px;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+/* === Selection color === */
+::selection {
+  background: rgba(78, 201, 176, 0.3);
+  color: inherit;
+}
+
+/* === Menu active link === */
+#menu .active {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* === Theme toggle in menu === */
+#menu .theme-toggle {
+  vertical-align: middle;
+}
+
+/* === Social icons === */
+.social-icons a:hover svg {
+  fill: var(--accent);
+}
+
+/* === Search highlight === */
+.search-highlight {
+  color: var(--accent);
+}
+
+/* === Archive year header === */
+.archive-year {
+  color: var(--accent);
+}
+
+/* === Pixel world bottom bar === */
+body {
+  padding-bottom: 140px;
+}
+
+#pixel-world {
+  background: none;
+}
+
+
+
+/* === Matrix rain background === */
+html {
+  background: var(--theme);
+}
+
+/* body must stay see-through, otherwise its background paints over the canvas
+   (.list is the list-page background PaperMod puts on the home/taxonomy pages) */
+body,
+body.list {
+  background-color: transparent !important;
+}
+
+#matrix-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.22;
+}
+
+:root[data-theme="light"] #matrix-rain {
+  opacity: 0.14;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) #matrix-rain {
+    opacity: 0.14;
+  }
+}
+
+/* keep long-form reading comfortable over the rain */
+.post-content,
+.post-single .post-header {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #matrix-rain {
+    display: none;
+  }
+}
+
+/* === Slide-out pixel controller === */
+#gamepad-ctrl {
+  position: fixed;
+  right: 0;
+  bottom: 24px;
+  z-index: 51;
+  display: flex;
+  align-items: stretch;
+  pointer-events: none;
+  image-rendering: pixelated;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  /* the whole rig slides, so the tab rides along and pulls the panel out.
+     JS measures the real panel width into --gp-panel-w; this is the pre-JS guess. */
+  transform: translateX(var(--gp-panel-w, 130px));
+  transition: transform 0.3s steps(8, end);
+}
+
+#gamepad-ctrl[data-open="true"] {
+  transform: translateX(0);
+}
+
+#gamepad-toggle,
+#gamepad-panel {
+  pointer-events: auto;
+}
+
+/* --- pull tab --- */
+#gamepad-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 20px;
+  padding: 10px 0;
+  border: 2px solid var(--accent-dim);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  background: rgba(14, 20, 26, 0.94);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+#gamepad-toggle:hover {
+  background: rgba(24, 36, 44, 0.97);
+  border-color: var(--accent);
+}
+
+#gamepad-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.gp-toggle-arrow {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 7px solid currentColor;
+  transition: transform 0.25s ease;
+}
+
+#gamepad-ctrl[data-open="true"] .gp-toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.gp-toggle-label {
+  writing-mode: vertical-rl;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--secondary);
+}
+
+/* --- sliding panel --- */
+#gamepad-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 2px solid var(--accent-dim);
+  border-right: none;
+  background: rgba(14, 20, 26, 0.94);
+  /* hidden while parked off-screen so it stays out of the tab order */
+  visibility: hidden;
+  transition: visibility 0s linear 0.3s;
+}
+
+#gamepad-ctrl[data-open="true"] #gamepad-panel {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* --- d-pad cluster --- */
+.gp-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 26px);
+  grid-template-rows: repeat(3, 26px);
+  gap: 2px;
+}
+
+.gp-up    { grid-area: 1 / 2; }
+.gp-left  { grid-area: 2 / 1; }
+.gp-right { grid-area: 2 / 3; }
+.gp-down  { grid-area: 3 / 2; }
+
+.gp-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- the buttons themselves --- */
+.gp-btn {
+  display: block;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  touch-action: none;
+  transition: transform 0.08s steps(2, end);
+}
+
+.gp-btn svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* the whole point of the look: no anti-aliased diagonals */
+  shape-rendering: crispEdges;
+}
+
+.gp-computer,
+.gp-rocket {
+  width: 30px;
+  height: 30px;
+}
+
+.gp-edge  { fill: #14181c; }
+.gp-shade { fill: #9aa3a9; }
+.gp-face  { fill: #f2f4f5; }
+.gp-glyph { fill: #5c666d; }
+
+.gp-btn:hover .gp-face { fill: #ffffff; }
+.gp-btn:hover .gp-glyph { fill: #3d454a; }
+
+.gp-btn:active,
+.gp-btn.is-held {
+  transform: translateY(2px);
+}
+
+.gp-btn:active .gp-face,
+.gp-btn.is-held .gp-face {
+  fill: #c9ced1;
+}
+
+.gp-btn:active .gp-glyph,
+.gp-btn.is-held .gp-glyph {
+  fill: #2b3135;
+}
+
+.gp-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.gp-computer[aria-pressed="true"] .gp-face {
+  fill: #bfe6dc;
+}
+
+/* --- rocket only exists once the hacker is at the keyboard --- */
+.gp-rocket {
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.22s steps(4, end), opacity 0.18s linear;
+}
+
+#gamepad-ctrl[data-armed="true"] .gp-rocket {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#gamepad-ctrl[data-armed="true"] .gp-rocket:active,
+#gamepad-ctrl[data-armed="true"] .gp-rocket.is-held {
+  transform: scale(1) translateY(2px);
+}
+
+@media (max-width: 560px) {
+  .gp-dpad {
+    grid-template-columns: repeat(3, 24px);
+    grid-template-rows: repeat(3, 24px);
+  }
+  .gp-btn { width: 24px; height: 24px; }
+  .gp-computer, .gp-rocket { width: 28px; height: 28px; }
+  #gamepad-panel { gap: 8px; padding: 7px 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #gamepad-ctrl,
+  .gp-btn,
+  .gp-rocket,
+  .gp-toggle-arrow {
+    transition: none;
+  }
+}

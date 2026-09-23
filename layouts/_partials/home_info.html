@@ -1,0 +1,12 @@
+{{- with site.Params.homeInfoParams }}
+<article class="first-entry home-info">
+    <div class="home-profile">
+        {{- if .imageUrl }}
+        <img class="home-profile-avatar" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "avatar" }}" draggable="false" />
+        {{- end }}
+        <h1 class="home-profile-name">{{ .Title | markdownify }}</h1>
+        <p class="home-profile-subtitle">{{ .Content | markdownify }}</p>
+        {{ partial "social_icons.html" (dict "align" "center") }}
+    </div>
+</article>
+{{- end -}}

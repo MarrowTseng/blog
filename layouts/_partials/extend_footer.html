@@ -1,0 +1,1223 @@
+{{ partial "matrix_rain.html" . }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var prompt = document.getElementById('terminal-prompt');
+    var input = document.getElementById('terminal-input');
+    var cursor = document.getElementById('terminal-cursor');
+    var output = document.getElementById('terminal-output');
+    var outputTimer = null;
+
+    if (!prompt || !input) return;
+
+    var commands = {
+        'help': '<span class="cmd-accent">Available commands:</span>\n  help      - Show this message\n  about     - About Dowhu\n  ls        - List posts\n  search    - Search articles\n  tags      - Browse tags\n  archives  - View archives\n  clear     - Close terminal',
+        'about': null,
+        'ls': null,
+        'ls posts': null,
+        'search': null,
+        'tags': null,
+        'archives': null,
+        'clear': null
+    };
+
+    var routes = {
+        'about': '/about/',
+        'ls': '/posts/',
+        'ls posts': '/posts/',
+        'search': '/search/',
+        'tags': '/tags/',
+        'archives': '/archives/'
+    };
+
+    prompt.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        input.classList.add('active');
+        input.focus();
+    });
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            var cmd = input.value.trim().toLowerCase();
+            input.value = '';
+
+            if (cmd === '' || cmd === 'clear') {
+                hideOutput();
+                input.classList.remove('active');
+                input.blur();
+                return;
+            }
+
+            if (routes[cmd]) {
+                window.location.href = routes[cmd];
+                return;
+            }
+
+            if (commands[cmd] !== undefined) {
+                showOutput(commands[cmd]);
+            } else {
+                showOutput('bash: <span class="cmd-accent">' + escapeHtml(cmd) + '</span>: command not found\nType <span class="cmd-accent">help</span> for available commands');
+            }
+        } else if (e.key === 'Escape') {
+            hideOutput();
+            input.classList.remove('active');
+            input.value = '';
+            input.blur();
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        if (!input.value) {
+            input.classList.remove('active');
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.logo')) {
+            hideOutput();
+            if (!input.value) {
+                input.classList.remove('active');
+            }
+        }
+    });
+
+    function showOutput(html) {
+        output.innerHTML = html;
+        output.style.display = 'block';
+        clearTimeout(outputTimer);
+        outputTimer = setTimeout(hideOutput, 8000);
+    }
+
+    function hideOutput() {
+        output.style.display = 'none';
+        clearTimeout(outputTimer);
+    }
+
+    function escapeHtml(str) {
+        var d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+});
+</script>
+
+<!-- Pixel Hacker Interactive -->
+<div id="pixel-world" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;pointer-events:none;">
+    <canvas id="pixel-canvas" style="width:100%;height:100%;"></canvas>
+</div>
+
+<!-- shared pixel-button chrome, referenced by every button below -->
+<svg id="gp-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+        <g id="gp-shell">
+            <polygon class="gp-edge" points="4,0 12,0 14,2 16,4 16,12 14,14 12,16 4,16 2,14 0,12 0,4 2,2"/>
+            <polygon class="gp-shade" points="5,1 11,1 13,3 15,5 15,11 13,13 11,15 5,15 3,13 1,11 1,5 3,3"/>
+            <polygon class="gp-face" points="5,1 11,1 13,3 15,5 15,11 13,13 11,15 5,15 3,13 1,11 1,5 3,3" transform="translate(-1,-1)"/>
+        </g>
+    </defs>
+</svg>
+
+<div id="gamepad-ctrl" data-open="false" data-armed="false">
+    <button id="gamepad-toggle" type="button" aria-expanded="false" aria-controls="gamepad-panel"
+            aria-label="開啟控制面板">
+        <span class="gp-toggle-arrow" aria-hidden="true"></span>
+        <span class="gp-toggle-label" aria-hidden="true">CTRL</span>
+    </button>
+
+    <div id="gamepad-panel">
+        <div class="gp-dpad">
+            <button class="gp-btn gp-up" type="button" data-hold="up" aria-label="跳躍">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><use href="#gp-shell"/><polygon class="gp-glyph" points="7,4 11,10 3,10"/></svg>
+            </button>
+            <button class="gp-btn gp-left" type="button" data-hold="left" aria-label="向左走">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><use href="#gp-shell"/><polygon class="gp-glyph" points="7,4 11,10 3,10" transform="rotate(-90 7 7)"/></svg>
+            </button>
+            <button class="gp-btn gp-right" type="button" data-hold="right" aria-label="向右走">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><use href="#gp-shell"/><polygon class="gp-glyph" points="7,4 11,10 3,10" transform="rotate(90 7 7)"/></svg>
+            </button>
+            <button class="gp-btn gp-down" type="button" data-hold="down" aria-label="蹲下">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><use href="#gp-shell"/><polygon class="gp-glyph" points="7,4 11,10 3,10" transform="rotate(180 7 7)"/></svg>
+            </button>
+        </div>
+
+        <div class="gp-actions">
+            <button class="gp-btn gp-computer" type="button" data-toggle="sit" aria-pressed="false" aria-label="坐到電腦前">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <use href="#gp-shell"/>
+                    <g class="gp-icon">
+                        <rect x="2" y="3" width="10" height="7" fill="#2b2f33"/>
+                        <rect x="3" y="4" width="8" height="5" fill="#6cb8d8"/>
+                        <rect x="3" y="4" width="8" height="2" fill="#8ed0e8"/>
+                        <rect x="1" y="10" width="12" height="2" fill="#d5dade"/>
+                        <rect x="1" y="12" width="12" height="1" fill="#2b2f33"/>
+                    </g>
+                </svg>
+            </button>
+
+            <button class="gp-btn gp-rocket" type="button" data-hold="fire" aria-label="發射飛彈" tabindex="-1" aria-hidden="true">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <use href="#gp-shell"/>
+                    <g class="gp-icon" transform="rotate(45 7 7)">
+                        <polygon points="7,0 10,5 4,5" fill="#e05a5a"/>
+                        <rect x="4" y="5" width="6" height="6" fill="#e8ebec"/>
+                        <rect x="4" y="5" width="3" height="6" fill="#ffffff"/>
+                        <rect x="5" y="6" width="4" height="3" fill="#2b2f33"/>
+                        <rect x="6" y="7" width="2" height="1" fill="#6cb8d8"/>
+                        <polygon points="4,9 1,13 4,13" fill="#e05a5a"/>
+                        <polygon points="10,9 13,13 10,13" fill="#e05a5a"/>
+                        <rect x="4" y="11" width="6" height="2" fill="#c94f4f"/>
+                        <polygon points="5,13 9,13 7,16" fill="#f0a030"/>
+                        <polygon points="6,13 8,13 7,15" fill="#ffd45e"/>
+                    </g>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var canvas = document.getElementById('pixel-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var W, H;
+    var ACCENT = '#4ec9b0';
+    var S = 3;
+
+    function resize() {
+        var rect = canvas.parentElement.getBoundingClientRect();
+        W = rect.width;
+        H = rect.height;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function groundY() { return H - 6; }
+    function deskX() { return Math.max(80, Math.floor(W * 0.12)); }
+
+    // --- Hacker state ---
+    var hacker = {
+        x: 300, dir: 1, state: 'walk', frame: 0,
+        vy: 0, onGround: true, crouching: false,
+        sitting: false, controlled: false, runningToDesk: false,
+        jumpY: 0
+    };
+    var WALK_SPEED = 2.2;
+    var RUN_SPEED = 7;
+    var JUMP_VY = -7.5;
+    var GRAVITY = 0.32;
+    // near the top of the arc gravity eases off, so he hangs there a beat
+    var APEX_VY = 2.2;
+    var APEX_GRAVITY = 0.55;
+
+    // --- Input state ---
+    var keys = {};
+    var panelOpen = false;
+    var btnHeld = {};
+
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        var k = e.key.toLowerCase();
+        if (['a','d','w','s','arrowleft','arrowright','arrowup','arrowdown',' '].indexOf(k) >= 0) {
+            keys[k] = true;
+            // WASD slides the panel out too, so the controls match what the keys do
+            if (!panelOpen) setPanelOpen(true);
+            e.preventDefault();
+        }
+    });
+    document.addEventListener('keyup', function(e) {
+        keys[e.key.toLowerCase()] = false;
+    });
+
+    function isLeft() { return keys['a'] || keys['arrowleft'] || btnHeld['left']; }
+    function isRight() { return keys['d'] || keys['arrowright'] || btnHeld['right']; }
+    function isJump() { return keys['w'] || keys['arrowup'] || keys[' '] || btnHeld['up']; }
+    function isCrouch() { return keys['s'] || keys['arrowdown'] || btnHeld['down']; }
+    function isFire() { return keys['f'] || btnHeld['fire']; }
+
+    // --- Missiles, particles, explosions ---
+    var missiles = [];
+    var particles = [];
+    var explosions = [];
+    var tick = 0;
+    var fireCooldown = 0;
+
+    // --- Slide-out pixel controller (DOM) ---
+    var ctrlRoot = document.getElementById('gamepad-ctrl');
+    var toggleBtn = document.getElementById('gamepad-toggle');
+    var rocketBtn = ctrlRoot ? ctrlRoot.querySelector('.gp-rocket') : null;
+    var sitBtn = ctrlRoot ? ctrlRoot.querySelector('[data-toggle="sit"]') : null;
+
+    function setArmed(on) {
+        if (!ctrlRoot) return;
+        ctrlRoot.setAttribute('data-armed', on ? 'true' : 'false');
+        if (rocketBtn) {
+            // keep the hidden rocket out of the tab order and off the a11y tree
+            rocketBtn.setAttribute('tabindex', on ? '0' : '-1');
+            rocketBtn.setAttribute('aria-hidden', on ? 'false' : 'true');
+        }
+    }
+
+    function deskSeatX() { return deskX() - 14 * S; }
+
+    function setSitting(on) {
+        if (on) {
+            // run over to the desk first — sitting, and the turrets, start on arrival
+            hacker.sitting = false;
+            hacker.runningToDesk = true;
+            hacker.crouching = false;
+            hacker.dir = deskSeatX() > hacker.x ? 1 : -1;
+        } else {
+            hacker.sitting = false;
+            hacker.runningToDesk = false;
+            setArmed(false);
+        }
+        if (sitBtn) sitBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+
+    function setPanelOpen(open) {
+        panelOpen = open;
+        if (!ctrlRoot) return;
+        ctrlRoot.setAttribute('data-open', open ? 'true' : 'false');
+        toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggleBtn.setAttribute('aria-label', open ? '收起控制面板' : '開啟控制面板');
+
+        if (open) {
+            hacker.controlled = true;
+            hacker.state = 'idle';
+        } else {
+            // closing hands the hacker back to his own devices
+            btnHeld = {};
+            keys = {};
+            setSitting(false);
+            hacker.controlled = false;
+            hacker.crouching = false;
+            hacker.state = 'walk';
+        }
+    }
+
+    if (ctrlRoot) {
+        // park the panel exactly its own width off-screen, leaving only the tab
+        var panelEl = document.getElementById('gamepad-panel');
+        function syncPanelWidth() {
+            if (panelEl) ctrlRoot.style.setProperty('--gp-panel-w', panelEl.offsetWidth + 'px');
+        }
+        syncPanelWidth();
+        window.addEventListener('resize', syncPanelWidth);
+
+        toggleBtn.addEventListener('click', function() {
+            setPanelOpen(!panelOpen);
+        });
+
+        var holdBtns = ctrlRoot.querySelectorAll('[data-hold]');
+        for (var hb = 0; hb < holdBtns.length; hb++) {
+            (function(btn) {
+                var id = btn.getAttribute('data-hold');
+
+                function press(e) {
+                    if (btn.getAttribute('aria-hidden') === 'true') return;
+                    e.preventDefault();
+                    btnHeld[id] = true;
+                    btn.classList.add('is-held');
+                    if (btn.setPointerCapture && e.pointerId !== undefined) {
+                        // throws if the pointer already went away; the button still works without capture
+                        try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+                    }
+                }
+
+                function release() {
+                    btnHeld[id] = false;
+                    btn.classList.remove('is-held');
+                }
+
+                btn.addEventListener('pointerdown', press);
+                btn.addEventListener('pointerup', release);
+                btn.addEventListener('pointercancel', release);
+                btn.addEventListener('pointerleave', release);
+                // keyboard users get the same press-and-hold
+                btn.addEventListener('keydown', function(e) {
+                    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); btnHeld[id] = true; btn.classList.add('is-held'); }
+                });
+                btn.addEventListener('keyup', function(e) {
+                    if (e.key === ' ' || e.key === 'Enter') release();
+                });
+                btn.addEventListener('blur', release);
+            })(holdBtns[hb]);
+        }
+
+        if (sitBtn) {
+            sitBtn.addEventListener('click', function() {
+                setSitting(!hacker.sitting);
+            });
+        }
+    }
+
+    // --- Pixel drawing helpers ---
+    function px(x, y, w, h, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(Math.floor(x), Math.floor(y), w, h);
+    }
+
+    // Where the volley lands: clear of the controller, whatever width it ends up.
+    function impactZoneX() {
+        var ctrlW = ctrlRoot ? ctrlRoot.offsetWidth : 170;
+        return Math.max(W * 0.45, W - ctrlW - 70);
+    }
+
+    // --- Fire missiles toward bottom-right (near gamepad) ---
+    function fireMissiles() {
+        if (!hacker.sitting || fireCooldown > 0) return;
+        fireCooldown = 20;
+        var GY = groundY();
+        var dk = deskX();
+        var hx = hacker.x;
+        var armEndpoints = [
+            { ox: hx+4*S,  oy: GY-20*S, lx: 36*S, ly: -20*S },
+            { ox: hx+12*S, oy: GY-20*S, lx: 52*S, ly: -14*S },
+            { ox: dk+24*S, oy: GY-30*S, lx: 36*S, ly: -6*S },
+            { ox: dk+26*S, oy: GY-20*S, lx: 40*S, ly: 1*S },
+            { ox: dk+2*S,  oy: GY-2*S,  lx: 46*S, ly: 0 },
+            { ox: hx+2*S,  oy: GY-6*S,  lx: 38*S, ly: 2*S },
+            { ox: dk+28*S, oy: GY-4*S,  lx: 38*S, ly: 0 }
+        ];
+        var tubeData = [];
+        for (var td = 0; td < armEndpoints.length; td++) {
+            var ep = armEndpoints[td];
+            tubeData.push({
+                x: ep.ox + ep.lx + 5*S,
+                y: ep.oy + ep.ly
+            });
+        }
+        var targetX = impactZoneX() + (Math.random() - 0.5) * 30;
+        var targetY = GY;
+        var count = 5 + Math.floor(Math.random() * 4);
+        for (var i = 0; i < count; i++) {
+            var tubeIdx = i % tubeData.length;
+            var sx = tubeData[tubeIdx].x;
+            var sy = tubeData[tubeIdx].y;
+            var dist = Math.sqrt((targetX-sx)*(targetX-sx) + (targetY-sy)*(targetY-sy));
+            var duration = 45 + Math.floor(dist / 5) + Math.floor(Math.random() * 20);
+            var arcHeight = 40 + Math.random() * 120;
+            missiles.push({
+                sx: sx, sy: sy, tx: targetX, ty: targetY,
+                arc: arcHeight,
+                t: 0, dt: 1 / duration,
+                x: sx, y: sy,
+                delay: i * 4
+            });
+            for (var p = 0; p < 6; p++) {
+                particles.push({
+                    x: sx + (Math.random()-0.5)*6, y: sy + (Math.random()-0.5)*6,
+                    vx: 1 + Math.random()*3,
+                    vy: (Math.random()-0.5)*4,
+                    life: 6+Math.random()*6,
+                    size: 3+Math.random()*4,
+                    color: p < 3 ? '#ffaa22' : '#ff6600', type: 'spark'
+                });
+            }
+        }
+    }
+
+    // --- Pixel explosion (mushroom cloud style) ---
+    function spawnExplosion(ex, ey) {
+        var GY = groundY();
+        ey = Math.min(ey, GY);
+        var s = 4;
+        var fireColors = ['#ff1100','#ff2200','#ff4400','#ff6600','#ff8800','#ffaa00','#ffcc00','#ffdd44','#ffee88'];
+        // Mushroom cloud core
+        for (var row = 0; row < 12; row++) {
+            var spread = row < 4 ? 6 : (row < 8 ? 4 : 3);
+            for (var col = -spread; col <= spread; col++) {
+                var r = Math.abs(col);
+                var prob = row < 4 ? (r < 4 ? 0.95 : 0.6) : (r < 3 ? 0.85 : 0.4);
+                if (row > 8) prob *= 0.5;
+                if (Math.random() > prob) continue;
+                var ci = Math.min(fireColors.length - 1, Math.floor(Math.random() * fireColors.length));
+                if (row < 3) ci = Math.min(ci, 3);
+                if (row > 8) ci = Math.max(ci, 5);
+                explosions.push({
+                    x: ex + col * s * 2 + (Math.random()-0.5)*s, y: ey - row * s * 2,
+                    size: s * 2 + Math.random() * s, color: fireColors[ci],
+                    life: 35 + Math.random() * 30,
+                    maxLife: 65,
+                    vx: (Math.random() - 0.5) * 1.2 + col * 0.1,
+                    vy: -Math.random() * 1.2 - 0.3
+                });
+            }
+        }
+        // Ground fire spread
+        for (var g = 0; g < 12; g++) {
+            var gx = ex + (Math.random() - 0.5) * 60;
+            explosions.push({
+                x: gx, y: ey - Math.random() * 6,
+                size: s * 2 + Math.random() * 4, color: fireColors[Math.floor(Math.random() * 4)],
+                life: 20 + Math.random() * 15,
+                maxLife: 35,
+                vx: (gx - ex) * 0.03, vy: -Math.random() * 0.5
+            });
+        }
+        // Smoke plume
+        for (var k = 0; k < 14; k++) {
+            explosions.push({
+                x: ex + (Math.random() - 0.5) * 30,
+                y: ey - 30 - Math.random() * 50,
+                size: 6 + Math.random() * 8,
+                color: Math.random() > 0.5 ? 'rgba(120,120,120,0.6)' : 'rgba(80,80,80,0.5)',
+                life: 50 + Math.random() * 30,
+                maxLife: 80,
+                vx: (Math.random() - 0.5) * 1.0,
+                vy: -0.8 - Math.random() * 0.8
+            });
+        }
+        // Sparks flying outward
+        for (var sp = 0; sp < 8; sp++) {
+            var ang = Math.random() * Math.PI * 2;
+            var spd = 2 + Math.random() * 3;
+            particles.push({
+                x: ex, y: ey,
+                vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 2,
+                life: 12 + Math.random() * 8,
+                size: 2 + Math.random() * 3,
+                color: '#ffcc00', type: 'spark'
+            });
+        }
+    }
+
+    // --- Update ---
+    function update() {
+        tick++;
+        updateRobot();
+        if (fireCooldown > 0) fireCooldown--;
+        var GY = groundY();
+
+        // Hacker movement
+        if (hacker.runningToDesk) {
+            var seat = deskSeatX();
+            var toSeat = seat - hacker.x;
+            if (Math.abs(toSeat) <= RUN_SPEED) {
+                hacker.x = seat;
+                hacker.runningToDesk = false;
+                hacker.sitting = true;
+                hacker.dir = 1;
+                hacker.state = 'idle';
+                setArmed(true);
+            } else {
+                hacker.x += (toSeat > 0 ? RUN_SPEED : -RUN_SPEED);
+                hacker.dir = toSeat > 0 ? 1 : -1;
+                hacker.frame += 0.3;
+                hacker.state = 'walk';
+            }
+        } else if (hacker.controlled && !hacker.sitting) {
+            var moving = false;
+            if (isLeft()) {
+                hacker.x -= WALK_SPEED;
+                hacker.dir = -1;
+                moving = true;
+            }
+            if (isRight()) {
+                hacker.x += WALK_SPEED;
+                hacker.dir = 1;
+                moving = true;
+            }
+            hacker.x = Math.max(10, Math.min(W - 50, hacker.x));
+            if (isJump() && hacker.onGround) {
+                hacker.vy = JUMP_VY;
+                hacker.onGround = false;
+            }
+            hacker.crouching = isCrouch() && hacker.onGround;
+            if (moving && hacker.onGround && !hacker.crouching) {
+                hacker.frame += 0.1;
+                hacker.state = 'walk';
+            } else if (!hacker.onGround) {
+                hacker.state = 'jump';
+            } else if (hacker.crouching) {
+                hacker.state = 'crouch';
+            } else {
+                hacker.state = 'idle';
+            }
+        } else if (!hacker.controlled) {
+            hacker.frame += 0.06;
+            hacker.x += hacker.dir * 0.7;
+            if (hacker.x > W - 60) hacker.dir = -1;
+            if (hacker.x < 10) hacker.dir = 1;
+            hacker.state = 'walk';
+        }
+
+        // jumpY is the sprite's height above the ground, integrated for a real arc
+        if (!hacker.onGround) {
+            hacker.vy += Math.abs(hacker.vy) < APEX_VY ? GRAVITY * APEX_GRAVITY : GRAVITY;
+            hacker.jumpY += hacker.vy;
+            if (hacker.jumpY >= 0) {
+                hacker.jumpY = 0;
+                hacker.vy = 0;
+                hacker.onGround = true;
+            }
+        }
+
+        if (hacker.sitting && (isFire() || btnHeld['fire'])) {
+            fireMissiles();
+        }
+
+        // Missiles (parametric parabolic arcs)
+        for (var i = missiles.length - 1; i >= 0; i--) {
+            var m = missiles[i];
+            if (m.delay > 0) { m.delay--; continue; }
+            m.t += m.dt;
+            var t = Math.min(m.t, 1);
+            m.x = m.sx + (m.tx - m.sx) * t;
+            m.y = m.sy + (m.ty - m.sy) * t - m.arc * Math.sin(Math.PI * t);
+            if (Math.floor(m.t / m.dt) % 2 === 0) {
+                for (var sp = 0; sp < 2; sp++) {
+                    particles.push({
+                        x: m.x + (Math.random()-0.5)*4, y: m.y + (Math.random()-0.5)*4,
+                        vx: (Math.random()-0.5)*0.8, vy: -Math.random()*0.8 - 0.2,
+                        life: 22 + Math.random()*14,
+                        size: 5 + Math.random()*5,
+                        color: Math.random() > 0.3 ? '#ddeeff' : '#aabbcc', type: 'smoke'
+                    });
+                }
+            }
+            if (m.t >= 1) {
+                spawnExplosion(m.tx, m.ty);
+                hitRobot(m.tx);
+                missiles.splice(i, 1);
+            }
+        }
+
+        // Particles
+        for (var j = particles.length - 1; j >= 0; j--) {
+            var pt = particles[j];
+            pt.x += pt.vx || 0;
+            pt.y += pt.vy || 0;
+            if (pt.type === 'spark') pt.vy += 0.15;
+            if (pt.type === 'smoke') { pt.size *= 1.02; pt.vy -= 0.01; }
+            pt.life--;
+            if (pt.life <= 0) particles.splice(j, 1);
+        }
+
+        // Explosions
+        for (var e = explosions.length - 1; e >= 0; e--) {
+            var ex = explosions[e];
+            ex.x += ex.vx || 0;
+            ex.y += ex.vy || 0;
+            ex.life--;
+            if (ex.life <= 0) explosions.splice(e, 1);
+        }
+    }
+
+    // --- Draw pixel-art hacker (detailed) ---
+    function drawHacker(x, baseY) {
+        var s = S;
+        var jumpOffset = hacker.jumpY;
+        var by = baseY + jumpOffset;
+        var d = hacker.dir;
+        var glow = Math.sin(tick * 0.08) * 0.15 + 0.85;
+
+        if (hacker.sitting) {
+            // Hoodie head
+            px(x+2*s, by-24*s, 12*s, 3*s, '#12122a');
+            px(x+1*s, by-21*s, 14*s, 8*s, '#1a1a2e');
+            px(x+3*s, by-20*s, 10*s, 6*s, '#141428');
+            // Face
+            px(x+4*s, by-19*s, 8*s, 4*s, '#d4a574');
+            px(x+5*s, by-18*s, 6*s, 2*s, '#dbb58a');
+            // Visor / cyber eye
+            ctx.globalAlpha = glow;
+            px(x+(d>0?9:5)*s, by-19*s, 3*s, 2*s, ACCENT);
+            px(x+(d>0?10:6)*s, by-18*s, 1*s, 1*s, '#fff');
+            ctx.globalAlpha = 1;
+            // Body (jacket with details)
+            px(x+2*s, by-13*s, 12*s, 9*s, '#1e1e3a');
+            px(x+7*s, by-13*s, 1*s, 9*s, '#151530');
+            px(x+3*s, by-12*s, 2*s, 1*s, ACCENT);
+            px(x+11*s, by-12*s, 2*s, 1*s, ACCENT);
+            // Arms on desk
+            px(x+0*s, by-10*s, 4*s, 4*s, '#1e1e3a');
+            px(x+1*s, by-7*s, 3*s, 2*s, '#222');
+            px(x+12*s, by-10*s, 4*s, 4*s, '#1e1e3a');
+            px(x+12*s, by-7*s, 3*s, 2*s, '#222');
+            // Legs folded
+            px(x+2*s, by-4*s, 5*s, 4*s, '#2a2a4a');
+            px(x+9*s, by-4*s, 5*s, 4*s, '#2a2a4a');
+            // Boots
+            px(x+2*s, by-1*s, 5*s, 1*s, '#111');
+            px(x+9*s, by-1*s, 5*s, 1*s, '#111');
+            return;
+        }
+
+        if (hacker.crouching) {
+            px(x+2*s, by-16*s, 12*s, 3*s, '#12122a');
+            px(x+1*s, by-13*s, 14*s, 6*s, '#1a1a2e');
+            px(x+4*s, by-12*s, 8*s, 4*s, '#d4a574');
+            ctx.globalAlpha = glow;
+            px(x+(d>0?9:5)*s, by-12*s, 3*s, 2*s, ACCENT);
+            ctx.globalAlpha = 1;
+            px(x+2*s, by-7*s, 12*s, 5*s, '#1e1e3a');
+            px(x+7*s, by-7*s, 1*s, 5*s, '#151530');
+            px(x+1*s, by-2*s, 14*s, 2*s, '#2a2a4a');
+            px(x+1*s, by-0*s, 6*s, 1*s, '#111');
+            px(x+9*s, by-0*s, 6*s, 1*s, '#111');
+            return;
+        }
+
+        var bob = hacker.state === 'walk' ? Math.sin(hacker.frame * 3) * 1.5 : 0;
+        var legA = hacker.state === 'walk' ? Math.sin(hacker.frame * 3) * 3 : 0;
+        var legB = hacker.state === 'walk' ? Math.sin(hacker.frame * 3 + Math.PI) * 3 : 0;
+        var armSwing = hacker.state === 'walk' ? Math.sin(hacker.frame * 3) * 2 : 0;
+
+        // Hoodie top
+        px(x+2*s, by-26*s+bob, 12*s, 3*s, '#12122a');
+        // Hoodie body
+        px(x+1*s, by-23*s+bob, 14*s, 9*s, '#1a1a2e');
+        // Inner hood shadow
+        px(x+3*s, by-22*s+bob, 10*s, 7*s, '#141428');
+        // Face
+        px(x+4*s, by-21*s+bob, 8*s, 5*s, '#d4a574');
+        px(x+5*s, by-20*s+bob, 6*s, 3*s, '#dbb58a');
+        // Mouth
+        px(x+6*s, by-17*s+bob, 4*s, 1*s, '#c49060');
+        // Visor / cyber eye with glow
+        ctx.globalAlpha = glow;
+        px(x+(d>0?9:4)*s, by-21*s+bob, 4*s, 2*s, ACCENT);
+        px(x+(d>0?10:5)*s, by-20*s+bob, 2*s, 1*s, '#fff');
+        ctx.globalAlpha = 0.3 * glow;
+        px(x+(d>0?12:2)*s, by-20*s+bob, 2*s, 1*s, ACCENT);
+        ctx.globalAlpha = 1;
+        // Body (tactical jacket)
+        px(x+2*s, by-14*s+bob, 12*s, 9*s, '#1e1e3a');
+        // Jacket center line
+        px(x+7*s, by-14*s+bob, 2*s, 9*s, '#151530');
+        // Shoulder pads
+        px(x+1*s, by-14*s+bob, 3*s, 2*s, '#252545');
+        px(x+12*s, by-14*s+bob, 3*s, 2*s, '#252545');
+        // Accent stripes on jacket
+        px(x+3*s, by-13*s+bob, 2*s, 1*s, ACCENT);
+        px(x+11*s, by-13*s+bob, 2*s, 1*s, ACCENT);
+        // Belt
+        px(x+3*s, by-6*s+bob, 10*s, 1*s, '#333');
+        px(x+7*s, by-6*s+bob, 2*s, 1*s, '#555');
+        // Arms
+        var armX1 = d > 0 ? x+13*s : x-2*s;
+        var armX2 = d > 0 ? x-1*s : x+14*s;
+        px(armX1, by-13*s+bob+armSwing, 3*s, 7*s, '#1e1e3a');
+        px(armX1, by-7*s+bob+armSwing, 3*s, 2*s, '#222');
+        px(armX2, by-13*s+bob-armSwing, 3*s, 7*s, '#1e1e3a');
+        px(armX2, by-7*s+bob-armSwing, 3*s, 2*s, '#222');
+        // Legs
+        px(x+(3+legA)*s, by-5*s, 5*s, 5*s, '#2a2a4a');
+        px(x+(8+legB)*s, by-5*s, 5*s, 5*s, '#2a2a4a');
+        // Boots
+        px(x+(2+legA)*s, by-0*s, 6*s, 1*s, '#111');
+        px(x+(8+legB)*s, by-0*s, 6*s, 1*s, '#111');
+        px(x+(3+legA)*s, by-1*s, 1*s, 1*s, ACCENT);
+        px(x+(12+legB)*s, by-1*s, 1*s, 1*s, ACCENT);
+    }
+
+    // --- Draw desk (detailed workstation) ---
+    function drawDesk(dx, baseY) {
+        var s = S;
+        // PC Tower (left side under desk)
+        px(dx-2*s, baseY-9*s, 8*s, 9*s, '#1a1a30');
+        px(dx-1*s, baseY-8*s, 6*s, 7*s, '#151528');
+        px(dx+0*s, baseY-7*s, 4*s, 2*s, '#111122');
+        // Tower LEDs
+        if (tick % 40 < 30) px(dx+4*s, baseY-8*s, 1*s, 1*s, ACCENT);
+        if (tick % 50 < 20) px(dx+4*s, baseY-6*s, 1*s, 1*s, '#ff4444');
+        px(dx+4*s, baseY-4*s, 1*s, 1*s, '#3344ff');
+        // Tower fan grill
+        for (var fi = 0; fi < 3; fi++) px(dx+0*s, baseY-5*s+fi*s, 3*s, 0.5*s, '#222238');
+        // Main monitor
+        px(dx+6*s, baseY-30*s, 20*s, 16*s, '#1e1e38');
+        px(dx+7*s, baseY-29*s, 18*s, 14*s, '#0e0e22');
+        // Monitor stand
+        px(dx+14*s, baseY-14*s, 4*s, 4*s, '#2a2a44');
+        px(dx+12*s, baseY-11*s, 8*s, 1*s, '#2a2a44');
+        // Screen content
+        px(dx+9*s, baseY-27*s, 14*s, 10*s, '#0a1a18');
+        // Code lines on screen
+        px(dx+10*s, baseY-26*s, 4*s, 1*s, ACCENT);
+        px(dx+15*s, baseY-26*s, 6*s, 1*s, '#3a6a5a');
+        px(dx+10*s, baseY-24*s, 8*s, 1*s, '#445566');
+        px(dx+10*s, baseY-22*s, 3*s, 1*s, '#ff6688');
+        px(dx+14*s, baseY-22*s, 6*s, 1*s, '#556688');
+        px(dx+10*s, baseY-20*s, 10*s, 1*s, '#3a6a5a');
+        // Blinking cursor on screen
+        if (tick % 50 < 30) px(dx+10*s, baseY-18*s, 2*s, 1*s, ACCENT);
+        // Monitor bezel light
+        if (tick % 60 < 40) px(dx+24*s, baseY-29*s, 1*s, 1*s, '#3344ff');
+        // Desk surface (metal/dark)
+        px(dx-4*s, baseY-10*s, 36*s, 2*s, '#2a2a48');
+        px(dx-4*s, baseY-10*s, 36*s, 1*s, '#333358');
+        // Desk edge accent line
+        px(dx-4*s, baseY-8*s, 36*s, 0.5*s, '#1a1a35');
+        // Desk legs (metal)
+        px(dx+0*s, baseY-8*s, 2*s, 8*s, '#2a2a44');
+        px(dx+28*s, baseY-8*s, 2*s, 8*s, '#2a2a44');
+        // Leg cross bar
+        px(dx+0*s, baseY-3*s, 30*s, 1*s, '#222240');
+        // Keyboard (mechanical)
+        px(dx+12*s, baseY-12*s, 12*s, 3*s, '#222240');
+        px(dx+13*s, baseY-12*s, 10*s, 2*s, '#1a1a35');
+        // Key LED strip
+        px(dx+13*s, baseY-11*s, 10*s, 0.5*s, 'rgba(78,201,176,0.3)');
+        // Mouse
+        px(dx+26*s, baseY-12*s, 4*s, 3*s, '#222240');
+        px(dx+27*s, baseY-12*s, 2*s, 1*s, '#333355');
+        // Cable from tower to monitor
+        px(dx+6*s, baseY-9*s, 1*s, 1*s, '#333');
+        px(dx+6*s, baseY-14*s, 1*s, 5*s, '#333');
+    }
+
+    // --- Draw sci-fi launchers (articulated arms from hacker + computer) ---
+    var launcherAnims = 0;
+    function drawLaunchers(dx, baseY) {
+        if (!hacker.sitting) {
+            if (launcherAnims > 0) launcherAnims = Math.max(0, launcherAnims - 0.04);
+            else return;
+        } else {
+            if (launcherAnims < 1) launcherAnims += 0.025;
+        }
+        var s = S;
+        var prog = Math.min(1, launcherAnims);
+        var hx = hacker.x;
+
+        // Each arm: origin + waypoints curving around character/monitor
+        // hacker body: hx ~ hx+15*s, monitor screen: dx+7 ~ dx+25, baseY-29 ~ baseY-15
+        var arms = [
+            // #1 From hacker left shoulder - goes LEFT, arcs up-left, then curves back RIGHT (bypasses left)
+            { ox: hx+4*s, oy: baseY-20*s, pts: [
+                [0, 0], [-10*s, -6*s], [-16*s, -14*s], [-8*s, -22*s], [12*s, -24*s], [36*s, -20*s]
+            ]},
+            // #2 From hacker right shoulder - goes UP above monitor then RIGHT
+            { ox: hx+12*s, oy: baseY-20*s, pts: [
+                [0, 0], [4*s, -14*s], [16*s, -18*s], [36*s, -16*s], [52*s, -14*s]
+            ]},
+            // #3 From monitor top-right corner - goes UP then RIGHT (above screen)
+            { ox: dx+24*s, oy: baseY-30*s, pts: [
+                [0, 0], [6*s, -8*s], [20*s, -10*s], [36*s, -6*s]
+            ]},
+            // #4 From monitor right edge - goes straight RIGHT (clear of screen)
+            { ox: dx+26*s, oy: baseY-20*s, pts: [
+                [0, 0], [10*s, -2*s], [24*s, 0], [40*s, 1*s]
+            ]},
+            // #5 From PC tower bottom - goes DOWN-LEFT then curves under and RIGHT
+            { ox: dx+2*s, oy: baseY-2*s, pts: [
+                [0, 0], [-6*s, 4*s], [8*s, 6*s], [28*s, 4*s], [46*s, 0]
+            ]},
+            // #6 From hacker lower-left back - goes LEFT and DOWN, then curves back RIGHT (bypasses left)
+            { ox: hx+2*s, oy: baseY-6*s, pts: [
+                [0, 0], [-12*s, 2*s], [-16*s, 6*s], [-6*s, 8*s], [16*s, 6*s], [38*s, 2*s]
+            ]},
+            // #7 From desk right leg area - goes DOWN-RIGHT then RIGHT
+            { ox: dx+28*s, oy: baseY-4*s, pts: [
+                [0, 0], [8*s, 4*s], [22*s, 4*s], [38*s, 0]
+            ]}
+        ];
+
+        for (var i = 0; i < arms.length; i++) {
+            var arm = arms[i];
+            var pts = arm.pts;
+            // Calculate how many points are visible based on prog
+            var totalPts = pts.length;
+            var visibleLen = prog * (totalPts - 1);
+            if (visibleLen < 0.3) continue;
+
+            var glow = Math.sin(tick * 0.12 + i * 1.3) * 0.3 + 0.7;
+
+            // Draw segments between waypoints
+            for (var j = 0; j < Math.min(totalPts - 1, Math.ceil(visibleLen)); j++) {
+                var segProg = Math.min(1, visibleLen - j);
+                var x0 = arm.ox + pts[j][0];
+                var y0 = arm.oy + pts[j][1];
+                var x1 = arm.ox + pts[j][0] + (pts[j+1][0] - pts[j][0]) * segProg;
+                var y1 = arm.oy + pts[j][1] + (pts[j+1][1] - pts[j][1]) * segProg;
+
+                var sdx = x1 - x0;
+                var sdy = y1 - y0;
+                var sLen = Math.sqrt(sdx*sdx + sdy*sdy);
+                if (sLen < 2) continue;
+                var angle = Math.atan2(sdy, sdx);
+
+                ctx.save();
+                ctx.translate(x0, y0);
+                ctx.rotate(angle);
+
+                var shade = j % 2 === 0 ? '#3a3a5a' : '#4a4a6a';
+                px(0, -2*s, Math.floor(sLen), 4*s, shade);
+
+                // Joint ring at start of each segment (except first)
+                if (j > 0) {
+                    px(-2, -3*s, 3, 6*s, '#555580');
+                    // Joint bolt
+                    px(-1, -3*s, 1, 1*s, '#666690');
+                    px(-1, 2*s, 1, 1*s, '#666690');
+                }
+
+                // Tech panel glow on longer segments
+                if (sLen > 8*s) {
+                    ctx.globalAlpha = glow * 0.7;
+                    px(Math.floor(sLen * 0.5), -3*s, 3*s, 1*s, ACCENT);
+                    px(Math.floor(sLen * 0.5), 2*s, 3*s, 1*s, ACCENT);
+                    ctx.globalAlpha = 1;
+                }
+
+                ctx.restore();
+            }
+
+            // Base housing at origin
+            px(arm.ox - 2*s, arm.oy - 3*s, 4*s, 6*s, '#3a3a5a');
+            px(arm.ox - 1*s, arm.oy - 2*s, 2*s, 4*s, '#444470');
+            px(arm.ox - 2*s, arm.oy - 3*s, 1*s, 1*s, '#555580');
+            px(arm.ox - 2*s, arm.oy + 2*s, 1*s, 1*s, '#555580');
+
+            // Muzzle at the tip (only when fully extended to that segment)
+            if (visibleLen >= totalPts - 1.05) {
+                var lastPt = pts[totalPts - 1];
+                var prevPt = pts[totalPts - 2];
+                var tipX = arm.ox + lastPt[0];
+                var tipY = arm.oy + lastPt[1];
+                var tipAngle = Math.atan2(lastPt[1] - prevPt[1], lastPt[0] - prevPt[0]);
+
+                ctx.save();
+                ctx.translate(tipX, tipY);
+                ctx.rotate(tipAngle);
+                // Muzzle nozzle
+                px(0, -4*s, 4*s, 8*s, '#4a4a6a');
+                px(1, -3*s, 2*s, 6*s, '#555580');
+                px(3*s, -2*s, 2*s, 4*s, '#222240');
+                // Muzzle glow
+                ctx.globalAlpha = glow;
+                px(4*s, -1*s, 2*s, 2*s, ACCENT);
+                ctx.globalAlpha = 0.4 * glow;
+                px(5*s, -2*s, 1*s, 4*s, ACCENT);
+                ctx.globalAlpha = 1;
+                ctx.restore();
+            }
+        }
+    }
+
+    // --- Draw pixel-art missile (detailed) ---
+    function drawMissile(mx, my, angle) {
+        ctx.save();
+        ctx.translate(Math.floor(mx), Math.floor(my));
+        ctx.rotate(angle);
+        var s = 2;
+        // Nose cone
+        px(-3*s, -1*s, 3*s, 2*s, '#dddde8');
+        px(-2*s, -2*s, 2*s, 4*s, '#ccccdd');
+        // Main body
+        px(0, -3*s, 8*s, 6*s, '#888899');
+        px(1*s, -2*s, 6*s, 4*s, '#999aaa');
+        // Body panel lines
+        px(2*s, -3*s, 1*s, 6*s, '#666677');
+        px(5*s, -3*s, 1*s, 6*s, '#666677');
+        // Red warning stripe
+        px(3*s, -3*s, 2*s, 1*s, '#ff2222');
+        px(3*s, 2*s, 2*s, 1*s, '#ff2222');
+        // Indicator lights
+        px(4*s, -1*s, 1*s, 1*s, '#ff3333');
+        px(4*s, 0*s, 1*s, 1*s, '#ff3333');
+        // Fins (swept back)
+        px(7*s, -5*s, 3*s, 2*s, '#666677');
+        px(7*s, 3*s, 3*s, 2*s, '#666677');
+        px(8*s, -4*s, 2*s, 1*s, '#777788');
+        px(8*s, 3*s, 2*s, 1*s, '#777788');
+        // Exhaust nozzle
+        px(8*s, -2*s, 2*s, 4*s, '#555566');
+        // Exhaust flame (animated)
+        var flicker = Math.random();
+        px(10*s, -2*s, 3*s, 4*s, '#ff6600');
+        px(11*s, -1*s, 2*s, 2*s, '#ffaa00');
+        if (flicker > 0.3) px(13*s, -1*s, 2*s, 2*s, '#ffcc44');
+        if (flicker > 0.6) px(14*s, 0*s, 1*s, 1*s, '#ffee88');
+        ctx.restore();
+    }
+
+    // --- Draw ---
+    // --- Evil robot: warps in at the impact zone, dies to a direct hit ---
+    var ROBOT_RESPAWN = 180 * 60;   // 3 minutes of on-screen time, in frames
+    var ROBOT_WARP = 72;            // length of the teleport-in sequence
+    var ROBOT_W = 16, ROBOT_H = 27; // sprite size in pixel units (hacker is 16x26)
+    var robot = null;
+    var robotTimer = ROBOT_RESPAWN;
+
+    function spawnRobot() {
+        robot = { x: impactZoneX(), phase: 'warp', t: 0 };
+    }
+
+    function destroyRobot() {
+        if (!robot) return;
+        var GY = groundY();
+        var rx = robot.x;
+        spawnExplosion(rx, GY);
+        // shredded plating flung out of the wreck
+        for (var i = 0; i < 34; i++) {
+            var ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.6;
+            var spd = 2 + Math.random() * 5;
+            particles.push({
+                x: rx + (Math.random() - 0.5) * ROBOT_W * S,
+                y: GY - Math.random() * ROBOT_H * S,
+                vx: Math.cos(ang) * spd,
+                vy: Math.sin(ang) * spd,
+                life: 20 + Math.random() * 25,
+                size: 2 + Math.random() * 4,
+                color: ['#4e5a6b', '#3a4250', '#2a2f3a', '#ff3355'][Math.floor(Math.random() * 4)],
+                type: 'spark'
+            });
+        }
+        robot = null;
+        robotTimer = ROBOT_RESPAWN;
+    }
+
+    function hitRobot(hx) {
+        // only a fully materialised robot can be shot
+        if (!robot || robot.phase !== 'alive') return;
+        if (Math.abs(hx - robot.x) > 20 * S) return;
+        destroyRobot();
+    }
+
+    function updateRobot() {
+        if (!robot) {
+            if (robotTimer > 0) robotTimer--;
+            else spawnRobot();
+            return;
+        }
+        robot.t++;
+        if (robot.phase === 'warp' && robot.t >= ROBOT_WARP) {
+            robot.phase = 'alive';
+            robot.t = 0;
+        }
+    }
+
+    // the sprite itself, drawn from the ground up
+    function drawRobotSprite(cx, baseY, hover) {
+        var s = S;
+        var x = cx - (ROBOT_W / 2) * s;
+        var by = baseY - hover;
+        var DARK = '#16191f', BODY = '#2a2f3a', MID = '#3a4250', EDGE = '#4e5a6b';
+        var pulse = Math.sin(tick * 0.09) * 0.25 + 0.75;
+
+        // Feet
+        px(x+1*s,  by-2*s,  5*s, 2*s, DARK);
+        px(x+10*s, by-2*s,  5*s, 2*s, DARK);
+        // Legs
+        px(x+2*s,  by-8*s,  3*s, 6*s, BODY);
+        px(x+11*s, by-8*s,  3*s, 6*s, BODY);
+        px(x+2*s,  by-8*s,  3*s, 1*s, EDGE);
+        px(x+11*s, by-8*s,  3*s, 1*s, EDGE);
+        // Pelvis
+        px(x+3*s,  by-11*s, 10*s, 3*s, MID);
+        px(x+3*s,  by-11*s, 10*s, 1*s, DARK);
+        // Torso
+        px(x+2*s,  by-20*s, 12*s, 9*s, BODY);
+        px(x+2*s,  by-20*s, 2*s,  9*s, MID);
+        px(x+3*s,  by-19*s, 2*s,  1*s, DARK);
+        px(x+11*s, by-19*s, 2*s,  1*s, DARK);
+        // Reactor core
+        ctx.globalAlpha = pulse;
+        px(x+6*s,  by-18*s, 4*s, 4*s, '#ff3355');
+        ctx.globalAlpha = 1;
+        px(x+7*s,  by-17*s, 2*s, 2*s, '#ffdde3');
+        // Arms + claws
+        px(x+0*s,  by-20*s, 2*s, 8*s, BODY);
+        px(x+14*s, by-20*s, 2*s, 8*s, BODY);
+        px(x+0*s,  by-12*s, 3*s, 2*s, DARK);
+        px(x+13*s, by-12*s, 3*s, 2*s, DARK);
+        // Shoulder blocks with spikes
+        px(x+0*s,  by-22*s, 3*s, 3*s, MID);
+        px(x+13*s, by-22*s, 3*s, 3*s, MID);
+        px(x+0*s,  by-23*s, 1*s, 1*s, EDGE);
+        px(x+15*s, by-23*s, 1*s, 1*s, EDGE);
+        // Neck
+        px(x+7*s,  by-21*s, 2*s, 1*s, DARK);
+        // Head
+        px(x+4*s,  by-26*s, 8*s, 5*s, MID);
+        px(x+4*s,  by-26*s, 8*s, 1*s, EDGE);
+        px(x+5*s,  by-24*s, 6*s, 2*s, DARK);
+        // Scanning eye
+        var sweep = Math.floor((Math.sin(tick * 0.05) * 0.5 + 0.5) * 3);
+        ctx.globalAlpha = pulse;
+        px(x+(5+sweep)*s, by-24*s, 3*s, 2*s, '#ff3355');
+        ctx.globalAlpha = 1;
+        px(x+(6+sweep)*s, by-24*s, 1*s, 1*s, '#fff0f2');
+        // Antenna with blinking tip
+        px(x+7*s, by-28*s, 1*s, 2*s, EDGE);
+        if (tick % 40 < 20) px(x+7*s, by-29*s, 1*s, 1*s, '#ff3355');
+    }
+
+    function drawRobot(baseY) {
+        if (!robot) return;
+        var cx = robot.x;
+        var t = robot.t;
+        var hTop = baseY - (ROBOT_H + 2) * S;
+
+        if (robot.phase === 'alive') {
+            drawRobotSprite(cx, baseY, Math.sin(t * 0.06) * 2);
+            return;
+        }
+
+        // --- teleport-in ---
+
+        // 1. beam stabs down from the top of the screen
+        if (t < 26) {
+            var drop = Math.min(1, t / 14);
+            var bw = (2 + Math.sin(t * 0.7) * 1.5) * S;
+            ctx.globalAlpha = 0.5 + Math.random() * 0.3;
+            ctx.fillStyle = ACCENT;
+            ctx.fillRect(Math.floor(cx - bw / 2), 0, Math.ceil(bw), Math.floor(baseY * drop));
+            ctx.globalAlpha = 1;
+        }
+
+        // 2. shockwave rings skitter outward across the ground
+        for (var r = 0; r < 3; r++) {
+            var rt = t - r * 9;
+            if (rt < 0 || rt > 34) continue;
+            var rp = rt / 34;
+            var rad = rp * 34 * S;
+            ctx.globalAlpha = (1 - rp) * 0.8;
+            ctx.fillStyle = ACCENT;
+            for (var a = 0; a < 20; a++) {
+                var ang = (a / 20) * Math.PI * 2;
+                var ry = baseY + Math.sin(ang) * rad * 0.18;
+                var rxp = cx + Math.cos(ang) * rad;
+                ctx.fillRect(Math.floor(rxp), Math.floor(ry), 3, 2);
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // 3. the body assembles bottom-up behind a scan line, with glitch slices
+        if (t > 10) {
+            var reveal = Math.min(1, (t - 10) / 40);
+            var revealH = reveal * (ROBOT_H + 2) * S;
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(cx - 30 * S, baseY - revealH, 60 * S, revealH + 4);
+            ctx.clip();
+
+            // chromatic ghosts either side while it stabilises
+            if (reveal < 1) {
+                ctx.globalAlpha = 0.35;
+                ctx.save(); ctx.translate(-2 * S, 0); drawRobotSprite(cx, baseY, 0); ctx.restore();
+                ctx.save(); ctx.translate(2 * S, 0); drawRobotSprite(cx, baseY, 0); ctx.restore();
+                ctx.globalAlpha = 1;
+            }
+            drawRobotSprite(cx, baseY, 0);
+
+            // torn horizontal slices sliding sideways
+            if (reveal < 1) {
+                for (var g = 0; g < 3; g++) {
+                    var gy = baseY - Math.random() * revealH;
+                    var gh = (1 + Math.random() * 3) * S;
+                    var off = (Math.random() - 0.5) * 8 * S;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(cx - 30 * S, gy, 60 * S, gh);
+                    ctx.clip();
+                    ctx.globalAlpha = 0.9;
+                    ctx.translate(off, 0);
+                    drawRobotSprite(cx, baseY, 0);
+                    ctx.restore();
+                }
+                ctx.globalAlpha = 1;
+            }
+            ctx.restore();
+
+            // the scan line itself
+            if (reveal < 1) {
+                ctx.globalAlpha = 0.9;
+                ctx.fillStyle = '#eafff9';
+                ctx.fillRect(Math.floor(cx - 10 * S), Math.floor(baseY - revealH), 20 * S, 2);
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // 4. scan bars sweeping the silhouette
+        if (t > 14 && t < 62) {
+            ctx.globalAlpha = 0.25;
+            ctx.fillStyle = ACCENT;
+            for (var sb = 0; sb < 2; sb++) {
+                var sy = hTop + ((t * 3 + sb * 40) % ((ROBOT_H + 2) * S));
+                ctx.fillRect(Math.floor(cx - 9 * S), Math.floor(sy), 18 * S, 1);
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // 5. arrival flash
+        if (t > ROBOT_WARP - 16) {
+            var fa = 1 - (t - (ROBOT_WARP - 16)) / 16;
+            ctx.globalAlpha = fa * 0.75;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(Math.floor(cx - 11 * S), Math.floor(baseY - (ROBOT_H + 2) * S), 22 * S, (ROBOT_H + 2) * S);
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        var GY = groundY();
+        var dx = deskX();
+
+        // Ground line
+        ctx.fillStyle = 'rgba(78,201,176,0.12)';
+        ctx.fillRect(0, GY, W, 1);
+
+        drawDesk(dx, GY);
+        drawLaunchers(dx, GY);
+        drawHacker(hacker.x, GY);
+        drawRobot(GY);
+
+        // Smoke trails (white pixel smoke)
+        for (var k = 0; k < particles.length; k++) {
+            var pt = particles[k];
+            var alpha = Math.min(1, pt.life / 15);
+            if (pt.type === 'smoke') {
+                ctx.globalAlpha = alpha * 0.6;
+                ctx.fillStyle = pt.color;
+                var sz = Math.floor(pt.size);
+                ctx.fillRect(Math.floor(pt.x-sz/2), Math.floor(pt.y-sz/2), sz, sz);
+            } else {
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = pt.color;
+                ctx.fillRect(Math.floor(pt.x), Math.floor(pt.y), Math.ceil(pt.size), Math.ceil(pt.size));
+            }
+        }
+        ctx.globalAlpha = 1;
+
+        // Missiles
+        for (var i = 0; i < missiles.length; i++) {
+            var m = missiles[i];
+            if (m.delay > 0) continue;
+            var dx = m.tx - m.sx;
+            var dy = (m.ty - m.sy) - m.arc * Math.PI * Math.cos(Math.PI * m.t);
+            var angle = Math.atan2(dy, dx);
+            drawMissile(m.x, m.y, angle);
+        }
+
+        // Explosions (pixel blocks)
+        for (var e = 0; e < explosions.length; e++) {
+            var ex = explosions[e];
+            var alpha2 = Math.min(1, ex.life / (ex.maxLife * 0.4));
+            ctx.globalAlpha = alpha2;
+            ctx.fillStyle = ex.color;
+            var esz = Math.floor(ex.size);
+            ctx.fillRect(Math.floor(ex.x), Math.floor(ex.y), esz, esz);
+        }
+        ctx.globalAlpha = 1;
+    }
+
+    window._game = { hacker: hacker, missiles: missiles, particles: particles, explosions: explosions, fireMissiles: fireMissiles, update: update, draw: draw,
+        getRobot: function() { return robot; }, spawnRobot: spawnRobot, impactZoneX: impactZoneX };
+
+    function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+    loop();
+})();
+</script>

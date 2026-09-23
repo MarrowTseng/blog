@@ -2,8 +2,88 @@ baseURL = "https://blog.島呼.tw/"
 languageCode = "zh-tw"
 title = "Dowhu's Blog"
 theme = "PaperMod"
+paginate = 10
 
 [params]
-  defaultTheme = "auto"
+  env = "production"
+  author = "Dowhu"
+  description = "Dowhu 的技術部落格 — 資安研究、CTF Writeup、軟體開發筆記"
+  defaultTheme = "dark"
+  disableThemeToggle = false
   ShowReadingTime = true
   ShowPostNavLinks = true
+  ShowCodeCopyButtons = true
+  ShowBreadCrumbs = true
+  ShowToc = true
+  ShowWordCount = true
+  ShowShareButtons = false
+
+  [params.homeInfoParams]
+    Title = "Dowhu"
+    Content = "Security Researcher / CTF Player / Developer"
+    imageUrl = "images/avatar.svg"
+    imageTitle = "Dowhu"
+
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/MarrowTseng"
+
+  [[params.socialIcons]]
+    name = "linkedin"
+    url = "https://linkedin.com/in/PLACEHOLDER"
+
+  [params.label]
+    text = "[dowhu@blog ~]#"
+
+  [params.cover]
+    linkFullImages = true
+
+  [params.assets]
+    disableFingerprinting = false
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = true
+    style = "dracula"
+  [markup.tableOfContents]
+    endLevel = 4
+    startLevel = 2
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[[menu.main]]
+  identifier = "posts"
+  name = "Posts"
+  url = "/posts/"
+  weight = 10
+
+[[menu.main]]
+  identifier = "tags"
+  name = "Tags"
+  url = "/tags/"
+  weight = 20
+
+[[menu.main]]
+  identifier = "archives"
+  name = "Archives"
+  url = "/archives/"
+  weight = 30
+
+[[menu.main]]
+  identifier = "search"
+  name = "Search"
+  url = "/search/"
+  weight = 40
+
+[[menu.main]]
+  identifier = "about"
+  name = "About"
+  url = "/about/"
+  weight = 50

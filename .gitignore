@@ -1,0 +1,5 @@
+# Hugo build output — GitHub Actions rebuilds this from source on every push,
+# so the copy in the repo is unused and only creates noise in diffs.
+public/
+resources/
+.hugo_build.lock
