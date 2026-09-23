@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!prompt || !input) return;
 
     var commands = {
-        'help': '<span class="cmd-accent">Available commands:</span>\n  help      - Show this message\n  about     - About Dowhu\n  ls        - List posts\n  search    - Search articles\n  tags      - Browse tags\n  archives  - View archives\n  clear     - Close terminal',
+        'help': '<span class="cmd-accent">Available commands:</span>\n  help      - Show this message\n  home      - Back to the front page\n  about     - About Dowhu\n  ls        - List posts\n  search    - Search articles\n  tags      - Browse tags\n  archives  - View archives\n  clear     - Close terminal',
+        'home': null,
+        'cd': null,
+        'cd ~': null,
         'about': null,
         'ls': null,
         'ls posts': null,
@@ -22,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     var routes = {
+        'home': '/',
+        'cd': '/',
+        'cd ~': '/',
         'about': '/about/',
         'ls': '/posts/',
         'ls posts': '/posts/',
@@ -30,7 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'archives': '/archives/'
     };
 
-    prompt.addEventListener('click', function(e) {
+    // the prompt is a plain link home now; the blinking cursor opens the terminal
+    cursor.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         input.classList.add('active');

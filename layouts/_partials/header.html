@@ -3,9 +3,9 @@
         <div class="logo" style="position: relative;">
             {{- if site.Title }}
             <div class="terminal-wrapper">
-                <span class="terminal-prompt" id="terminal-prompt" title="Click to interact">[dowhu@blog ~]#</span>
+                <a class="terminal-prompt" id="terminal-prompt" href="{{ "" | absLangURL }}" title="回到首頁">[dowhu@blog ~]#</a>
                 <input class="terminal-input" id="terminal-input" type="text" autocomplete="off" spellcheck="false" aria-label="Terminal input" />
-                <span class="terminal-cursor" id="terminal-cursor">_</span>
+                <button class="terminal-cursor" id="terminal-cursor" type="button" title="點這裡輸入指令" aria-label="開啟終端機輸入">_</button>
             </div>
             <div class="terminal-output" id="terminal-output" style="display:none;"></div>
             {{- end }}

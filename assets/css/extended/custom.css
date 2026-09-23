@@ -82,12 +82,25 @@
   gap: 0;
 }
 
+/* the prompt is the site logo: clicking it goes home, like anywhere else */
 .terminal-prompt {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
   color: var(--accent);
   font-size: 20px;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.terminal-prompt:hover {
+  text-decoration: underline;
+}
+
+.terminal-prompt:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .terminal-input {
@@ -108,12 +121,32 @@
   width: 160px;
 }
 
+/* the blinking cursor is the terminal's handle, kept visually separate
+   from the prompt so the two click targets do not read as one */
 .terminal-cursor {
   color: var(--accent);
   animation: terminal-blink 1s step-end infinite;
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
   font-size: 20px;
-  margin-left: 2px;
+  margin-left: 6px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 0 5px;
+  line-height: 1.2;
+  cursor: text;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.terminal-cursor:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  animation: none;
+}
+
+.terminal-cursor:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .terminal-input.active + .terminal-cursor {
