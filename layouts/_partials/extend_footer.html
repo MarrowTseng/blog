@@ -502,7 +502,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (isMobile()) {
             // nothing to sit at or shoot on a phone; clear the scene once and
-            // then just let him pace
+            // then just let him pace.
+            // closing through setPanelOpen keeps data-open and panelOpen in step
+            // with hacker.controlled — clearing the flag on its own leaves the
+            // panel looking open while nothing is driving him.
+            if (panelOpen) setPanelOpen(false);
             if (hacker.sitting || hacker.runningToDesk || hacker.controlled ||
                 robot || missiles.length || explosions.length || particles.length) {
                 hacker.sitting = false;
@@ -574,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 hacker.state = 'idle';
             }
-        } else if (!hacker.controlled) {
+        } else if (!hacker.controlled && !hacker.sitting) {
             walkOnly();
         }
 
