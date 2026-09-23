@@ -672,8 +672,8 @@ document.addEventListener('DOMContentLoaded', function() {
         px(x+6*s, by-17*s+bob, 4*s, 1*s, '#c49060');
         // Visor / cyber eye with glow
         ctx.globalAlpha = glow;
-        px(x+(d>0?9:4)*s, by-21*s+bob, 4*s, 2*s, ACCENT);
-        px(x+(d>0?10:5)*s, by-20*s+bob, 2*s, 1*s, '#fff');
+        px(x+(d>0?9:3)*s, by-21*s+bob, 4*s, 2*s, ACCENT);
+        px(x+(d>0?10:4)*s, by-20*s+bob, 2*s, 1*s, '#fff');
         ctx.globalAlpha = 0.3 * glow;
         px(x+(d>0?12:2)*s, by-20*s+bob, 2*s, 1*s, ACCENT);
         ctx.globalAlpha = 1;
@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
         px(x+3*s, by-6*s+bob, 10*s, 1*s, '#333');
         px(x+7*s, by-6*s+bob, 2*s, 1*s, '#555');
         // Arms
-        var armX1 = d > 0 ? x+13*s : x-2*s;
+        var armX1 = d > 0 ? x+13*s : x+0*s;
         var armX2 = d > 0 ? x-1*s : x+14*s;
         px(armX1, by-13*s+bob+armSwing, 3*s, 7*s, '#1e1e3a');
         px(armX1, by-7*s+bob+armSwing, 3*s, 2*s, '#222');
@@ -989,7 +989,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var ROBOT_WARP = 72;            // length of the teleport-in sequence
     var ROBOT_W = 16, ROBOT_H = 27; // sprite size in pixel units (hacker is 16x26)
     var robot = null;
-    var robotTimer = ROBOT_RESPAWN;
+    var robotTimer = 0;   // first one warps in as soon as the page opens
 
     function spawnRobot() {
         robot = { x: impactZoneX(), phase: 'warp', t: 0 };
