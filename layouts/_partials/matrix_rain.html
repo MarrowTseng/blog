@@ -8,8 +8,11 @@
 
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     var ctx = canvas.getContext('2d');
-    var chars = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789$+-*/=<>[]{}#%&@'.split('');
+    var chars = 'ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦˉˊˇˋ˙'.split('');
     var fontSize = 15;
+    // bopomofo is full-width, so columns need more room than the glyph itself
+    var colWidth = 20;
+    var rowHeight = 17;
     var columns = 0;
     var drops = [];
     var speeds = [];
@@ -45,10 +48,10 @@
         canvas.style.width = width + 'px';
         canvas.style.height = height + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.font = fontSize + 'px "JetBrains Mono", "Fira Code", monospace';
+        ctx.font = fontSize + 'px "JetBrains Mono", "Fira Code", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", monospace';
         ctx.textBaseline = 'top';
 
-        var next = Math.ceil(width / fontSize);
+        var next = Math.ceil(width / colWidth);
         for (var i = columns; i < next; i++) {
             drops[i] = Math.random() * -50;
             speeds[i] = 0.5 + Math.random() * 0.9;
@@ -71,8 +74,8 @@
 
         for (var i = 0; i < columns; i++) {
             var ch = chars[(Math.random() * chars.length) | 0];
-            var x = i * fontSize;
-            var y = drops[i] * fontSize;
+            var x = i * colWidth;
+            var y = drops[i] * rowHeight;
 
             if (y > 0) {
                 ctx.fillStyle = colors.trail;
