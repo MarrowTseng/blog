@@ -1,5 +1,6 @@
 baseURL = "https://blog.島呼.tw/"
-languageCode = "zh-tw"
+locale = "zh-tw"
+defaultContentLanguage = "zh-tw"
 title = "Dowhu's Blog"
 theme = "PaperMod"
 paginate = 10
